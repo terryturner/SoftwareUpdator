@@ -65,12 +65,16 @@
     <string name="dialog_download_fail_format">Download File fail (%1$d): %2$s</string>
     <string name="dialog_install_success_format">Update %1$s success.</string>
     <string name="dialog_install_fail_format">Install %1$s fail: %2$d</string>
+    <string name="dialog_log_handle_format">Do you want to send or delete report?\n\nLog size: %1$s</string>
 
     <string name="msg_user_login">User Login</string>
     <string name="msg_user_logout">User Exit</string>
     <string name="msg_user_report_format">User report now. Current version is %1$d</string>
     <string name="msg_user_sync_fail_format">User download Fail (%1$d): %2$s</string>
     <string name="msg_user_install_format">User onPackageInstall (%1$d): %2$s</string>
+    <string name="msg_schedule_start_format">ScheduleService is created now (%1$d). Current version is %2$d</string>
     <string name="msg_schedule_sync_fail_format">ScheduleService Sync Fail (%1$d): %2$s</string>
     <string name="msg_schedule_install_format">ScheduleService onPackageInstall(%1$d): %2$s</string>
+
+    <string name="url_http_main_format">http://%1$s/test_auth/sample.xml</string>
 </resources>

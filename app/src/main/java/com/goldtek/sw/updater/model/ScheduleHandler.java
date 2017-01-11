@@ -7,6 +7,8 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
 
+import com.goldtek.sw.updater.GoldtekApplication;
+import com.goldtek.sw.updater.R;
 import com.goldtek.sw.updater.data.Response;
 import com.goldtek.sw.updater.data.xml.XmlApplicationItem;
 import com.goldtek.sw.updater.data.xml.MaintainItem;
@@ -82,8 +84,11 @@ public class ScheduleHandler extends Handler implements HttpDownloader.IDownload
                 String ip = ConfigManager.getInstance().getPrimaryServer();
 
                 if (ip != null) {
-                    Uri uri = Uri.parse("http://" + ip + "/sample.xml");
-                    new HttpDownloader(this).execute(uri.toString(), "sample.xml");
+                    Uri uri = Uri.parse(String.format(GoldtekApplication.getContext().getString(R.string.url_http_main_format), ip));
+                    if (ConfigManager.getInstance().needPrimaryServerAuth())
+                        new HttpDownloader(this).execute(uri.toString(), ConfigManager.getInstance().getPrimaryServerAuth(), "sample.xml");
+                    else
+                        new HttpDownloader(this).execute(uri.toString(), "sample.xml");
                 }
 
                 break;

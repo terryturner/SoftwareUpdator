@@ -281,7 +281,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // guidelines.
             findPreference(ConfigManager.KEY_UPDATE_AUTO).setOnPreferenceChangeListener(sPreferenceChangeListener);
             bindPreferenceSummaryToValue(findPreference(ConfigManager.KEY_SYNC_TIME));
-            bindPreferenceSummaryToValue(findPreference(ConfigManager.KEY_PRIMARY_SERVER_URL));
         }
 
         @Override

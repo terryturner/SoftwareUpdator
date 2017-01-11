@@ -70,6 +70,8 @@ public class ScheduleService extends Service implements ScheduleHandler.Listener
         int pid = android.os.Process.myPid();
         long id = Thread.currentThread().getId();
         Log.i(TAG, "onCreate Pid " + pid + ", ThreadId " + id + " : hashCode " + ScheduleService.this.hashCode());
+        String msg = String.format(getString(R.string.msg_schedule_start_format), pid, PackageManager.getInstance().getApplicationInfo().versionCode);
+        ReportHandler.getInstance().writeMessage(msg);
 
         mPollThread = new HandlerThread("polling");
         mPollThread.start();

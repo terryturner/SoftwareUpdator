@@ -39,7 +39,7 @@ public class ReportPreference extends PopupPreference implements DialogInterface
     @Override
     protected View onCreateDialogView() {
         View view = super.onCreateDialogView();
-        String msg = String.format("%s\n\nLog File: %s bytes", getContext().getString(R.string.pref_message_log), NumberFormat.getNumberInstance().format(ReportHandler.getInstance().getSize()));
+        String msg = String.format(getContext().getString(R.string.dialog_log_handle_format), ReportHandler.getInstance().humanReadableByteCount());
         setDialogMessage(msg);
         return view;
     }

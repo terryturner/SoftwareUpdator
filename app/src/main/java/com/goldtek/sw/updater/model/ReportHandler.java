@@ -29,6 +29,16 @@ public class ReportHandler extends LogHandler {
         return PATH+"/"+FILE_NAME;
     }
 
+    public String humanReadableByteCount() {
+        boolean si = true;
+        long bytes = getSize();
+        int unit = si ? 1000 : 1024;
+        if (bytes < unit) return bytes + " B";
+        int exp = (int) (Math.log(bytes) / Math.log(unit));
+        String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp-1) + (si ? "" : "i");
+        return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+    }
+
     public long getSize() {
         File file = new File(PATH+"/"+FILE_NAME);
         if (file.exists()) return file.length();

@@ -190,6 +190,12 @@ public class ConfigManager {
         return mPrimaryServerPwd;
     }
 
+    public String getPrimaryServerAuth() {
+        return mPrimaryServerAccount + ":" +mPrimaryServerPwd;
+    }
+
+    public boolean needPrimaryServerAuth() { return (mPrimaryServerAccount != null && mPrimaryServerPwd != null); }
+
     private static final Pattern IP_ADDRESS
             = Pattern.compile(
             "((25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9])\\.(25[0-5]|2[0-4]"
