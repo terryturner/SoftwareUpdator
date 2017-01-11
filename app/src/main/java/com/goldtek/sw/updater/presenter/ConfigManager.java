@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 
 import com.goldtek.sw.updater.GoldtekApplication;
 import com.goldtek.sw.updater.R;
+import com.goldtek.sw.updater.data.Protocol;
 import com.goldtek.sw.updater.data.xml.MaintainItem;
 
 import java.text.SimpleDateFormat;
@@ -26,11 +27,12 @@ public class ConfigManager {
 
     public final static String KEY_UPDATE_AUTO = "update_auto";
     public final static String KEY_SYNC_TIME = "sync_frequency";
+    public final static String KEY_PRIMARY_SERVER_PROTOCOL = "primary_server_protocol";
     public final static String KEY_PRIMARY_SERVER_URL = "primary_server_url";
     public final static String KEY_PRIMARY_SERVER_ACCOUNT = "primary_server_account";
     public final static String KEY_PRIMARY_SERVER_PASSWORD = "primary_server_password";
 
-
+    private static final boolean DEBUG = false;
     private static final ConfigManager sInstance = new ConfigManager(GoldtekApplication.getContext());
 
     public static ConfigManager getInstance() {
@@ -43,6 +45,7 @@ public class ConfigManager {
     private String mPrimaryServerURL;
     private String mPrimaryServerAccount;
     private String mPrimaryServerPwd;
+    private Protocol mPrimaryProtocol;
     private long mLastSyncTime;
     private long mLastSyncSuccessTime;
 
@@ -61,6 +64,11 @@ public class ConfigManager {
 
     public void setMaintenance(List<MaintainItem> items) {
         mMaintenanceList = items;
+        if (DEBUG) {
+            for (MaintainItem item : mMaintenanceList) {
+                item.debug();
+            }
+        }
         for(Observer cb : mObservers) cb.onMaintainChange();
     }
 
@@ -82,6 +90,7 @@ public class ConfigManager {
         mLastSyncSuccessTime = settings.getLong(KEY_LAST_SUCCESS, 0);
         mIsEnableAuto = settings.getBoolean(KEY_UPDATE_AUTO, true);
         mSyncTime = settings.getString(KEY_SYNC_TIME, "60");
+        mPrimaryProtocol = Enum.valueOf(Protocol.class, settings.getString(KEY_PRIMARY_SERVER_PROTOCOL, "HTTP"));
         mPrimaryServerURL = settings.getString(KEY_PRIMARY_SERVER_URL, GoldtekApplication.getContext().getString(R.string.pref_default_server));
         mPrimaryServerAccount = settings.getString(KEY_PRIMARY_SERVER_ACCOUNT, "");
         mPrimaryServerPwd = settings.getString(KEY_PRIMARY_SERVER_PASSWORD, "");
@@ -99,8 +108,12 @@ public class ConfigManager {
         for(Observer cb : mObservers) cb.onConfigChange(KEY_LAST_SYNC, String.valueOf(success));
     }
 
-    public void recordPrimaryServer(String url, String account, String pwd) {
+    public void recordPrimaryServer(Protocol protocol, String url, String account, String pwd) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
+        if (protocol != null) {
+            mPrimaryProtocol = protocol;
+            settings.edit().putString(KEY_PRIMARY_SERVER_PROTOCOL, protocol.name()).apply();
+        }
         if (url != null) {
             mPrimaryServerURL = url;
             settings.edit().putString(KEY_PRIMARY_SERVER_URL, url).apply();
@@ -182,6 +195,10 @@ public class ConfigManager {
         else return GoldtekApplication.getContext().getString(R.string.pref_default_server);
     }
 
+    public Protocol getPrimaryProtocol() {
+        return mPrimaryProtocol;
+    }
+
     public String getPrimaryServerAccount() {
         return mPrimaryServerAccount;
     }
@@ -194,7 +211,7 @@ public class ConfigManager {
         return mPrimaryServerAccount + ":" +mPrimaryServerPwd;
     }
 
-    public boolean needPrimaryServerAuth() { return (mPrimaryServerAccount != null && mPrimaryServerPwd != null); }
+    public boolean needPrimaryServerAuth() { return (mPrimaryServerAccount != null && mPrimaryServerPwd != null && !mPrimaryServerAccount.isEmpty() && !mPrimaryServerPwd.isEmpty()); }
 
     private static final Pattern IP_ADDRESS
             = Pattern.compile(

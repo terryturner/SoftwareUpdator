@@ -25,6 +25,10 @@ public class HttpDownloader extends AsyncTask<String, String, Response> {
     public final static int ERROR_getResponseCode = 4;
     public final static int ERROR_getInputStream = 5;
     public final static int ERROR_saveFile = 6;
+    public final static int ERROR_NoSuchAlgorithmException = 7;
+    public final static int ERROR_KeyManagementException = 8;
+
+    protected final static String TAG = "HTTP_Download";
 
     public interface IDownload {
         void onProgressUpdate(int progress);
@@ -36,7 +40,6 @@ public class HttpDownloader extends AsyncTask<String, String, Response> {
         this.listener = listener;
     }
 
-    private final static String TAG = "HTTP_Download";
 
     /**
      * Downloading file in background thread
@@ -54,7 +57,7 @@ public class HttpDownloader extends AsyncTask<String, String, Response> {
         URL url = null;
         try {
             result.request = param[0];
-            url = new URL(param[0]);
+            url = new URL(result.request);
         } catch (MalformedURLException e) {
             result.code = ERROR_MalformedURLException;
             return result;
@@ -72,6 +75,7 @@ public class HttpDownloader extends AsyncTask<String, String, Response> {
             String encode = new String(Base64.encode(loginPassword.getBytes(), Base64.NO_WRAP | Base64.URL_SAFE));
             connection.setRequestProperty ("Authorization", "Basic " + encode);
         }
+        //connection.setRequestProperty("Accept-Encoding", "identity");
         connection.setConnectTimeout(5000);
         connection.setReadTimeout(5000);
         try {
@@ -95,6 +99,7 @@ public class HttpDownloader extends AsyncTask<String, String, Response> {
             connection.disconnect();
             return result;
         }
+
         // this will be useful so that you can show a tipical 0-100% progress bar
         int lengthOfFile = connection.getContentLength();
 
@@ -119,7 +124,7 @@ public class HttpDownloader extends AsyncTask<String, String, Response> {
 
             while ((count = input.read(data)) != -1) {
                 total += count;
-                publishProgress("" + (int) ((total * 100) / lengthOfFile));
+                //publishProgress("" + (int) ((total * 100) / lengthOfFile));
 
                 output.write(data, 0, count);
             }
@@ -147,6 +152,7 @@ public class HttpDownloader extends AsyncTask<String, String, Response> {
      * Updating progress bar
      * */
     protected void onProgressUpdate(String... progress) {
+        //Log.i("terry", "progress: " + progress[0] + "%");
         if (listener != null)
             listener.onProgressUpdate(Integer.parseInt(progress[0]));
     }

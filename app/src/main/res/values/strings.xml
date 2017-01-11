@@ -18,6 +18,12 @@
     <string name="pref_title_secondary_server">Secondary Server</string>
     <string name="pref_title_tertiary_server">Tertiary Server</string>
     <string name="pref_default_server">192.168.42.35</string>
+    <string name="pref_label_server_protocol">Protocol</string>
+    <string name="pref_label_server_url">Server Address</string>
+    <string name="pref_label_server_account">Account</string>
+    <string name="pref_label_server_password">Password</string>
+    <string name="pref_option_server_protocol_http">HTTP</string>
+    <string name="pref_option_server_protocol_https">HTTPS</string>
 
     <string name="pref_title_sync_frequency">Sync frequency</string>
     <string-array name="pref_sync_frequency_titles">
@@ -40,7 +46,6 @@
     </string-array>
 
     <string name="pref_title_system_sync_settings">System sync settings</string>
-
 
     <string name="pref_header_information">Information</string>
     <string name="pref_title_last_sync_time">Last Sync Time</string>
@@ -76,5 +81,8 @@
     <string name="msg_schedule_sync_fail_format">ScheduleService Sync Fail (%1$d): %2$s</string>
     <string name="msg_schedule_install_format">ScheduleService onPackageInstall(%1$d): %2$s</string>
 
-    <string name="url_http_main_format">http://%1$s/test_auth/sample.xml</string>
+    <string name="url_http_auth_xml_format">http://%1$s/test_auth/sample.xml</string>
+    <string name="url_http_xml_format">http://%1$s/sample.xml</string>
+    <string name="url_https_auth_xml_format">https://%1$s/test_auth/sample.xml</string>
+    <string name="url_https_xml_format">https://%1$s/sample.xml</string>
 </resources>

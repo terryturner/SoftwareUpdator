@@ -9,6 +9,7 @@ import android.os.RemoteException;
 
 import com.goldtek.sw.updater.GoldtekApplication;
 import com.goldtek.sw.updater.R;
+import com.goldtek.sw.updater.data.Protocol;
 import com.goldtek.sw.updater.data.Response;
 import com.goldtek.sw.updater.data.xml.XmlApplicationItem;
 import com.goldtek.sw.updater.data.xml.MaintainItem;
@@ -20,7 +21,6 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * Created by Terry on 2017/1/4.
@@ -28,6 +28,7 @@ import java.lang.reflect.InvocationTargetException;
 
 public class ScheduleHandler extends Handler implements HttpDownloader.IDownload {
     private static final int MINUTE2MILLI = 60000;
+    private static final String XML_FILE = "sample.xml";
 
     public static final int POST_AUTO_UPDATE = 1;
     public static final int GET_XML_FILE = 2;
@@ -82,13 +83,29 @@ public class ScheduleHandler extends Handler implements HttpDownloader.IDownload
             case GET_XML_FILE:
                 ConfigManager.getInstance().queryConfig();
                 String ip = ConfigManager.getInstance().getPrimaryServer();
+                Protocol protocol = ConfigManager.getInstance().getPrimaryProtocol();
 
                 if (ip != null) {
-                    Uri uri = Uri.parse(String.format(GoldtekApplication.getContext().getString(R.string.url_http_main_format), ip));
-                    if (ConfigManager.getInstance().needPrimaryServerAuth())
-                        new HttpDownloader(this).execute(uri.toString(), ConfigManager.getInstance().getPrimaryServerAuth(), "sample.xml");
-                    else
-                        new HttpDownloader(this).execute(uri.toString(), "sample.xml");
+                    switch (protocol) {
+                        case HTTP:
+                            if (ConfigManager.getInstance().needPrimaryServerAuth()) {
+                                new HttpDownloader(this).execute(String.format(
+                                        GoldtekApplication.getContext().getString(R.string.url_http_auth_xml_format), ip),
+                                        ConfigManager.getInstance().getPrimaryServerAuth(), XML_FILE);
+                            } else {
+                                new HttpDownloader(this).execute(String.format(GoldtekApplication.getContext().getString(R.string.url_http_xml_format), ip), XML_FILE);
+                            }
+                            break;
+                        case HTTPS:
+                            if (ConfigManager.getInstance().needPrimaryServerAuth()) {
+                                new HttpsDownloader(this).execute(String.format(
+                                        GoldtekApplication.getContext().getString(R.string.url_https_auth_xml_format), ip),
+                                        ConfigManager.getInstance().getPrimaryServerAuth(), XML_FILE);
+                            } else {
+                                new HttpsDownloader(this).execute(String.format(GoldtekApplication.getContext().getString(R.string.url_https_xml_format), ip), XML_FILE);
+                            }
+                            break;
+                    }
                 }
 
                 break;

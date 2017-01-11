@@ -86,16 +86,8 @@ public class TestActivity extends Activity implements View.OnClickListener {
                 break;
             case R.id.download:
                 //if (bindSticky != null) bindSticky.killProcess();
-                new HttpDownloader(new HttpDownloader.IDownload() {
-                    @Override
-                    public void onProgressUpdate(int progress) {}
-
-                    @Override
-                    public void onPostExecute(Response result) {
-                        Log.i("terry", result.fileName + " get code: " + result.code);
-                    }
-                }).execute("http://192.168.42.35/test_auth/main.xml", "terry:terryy", "main.xml");
-
+                downloadHttps();
+                //downloadHttp();
                 break;
         }
     }
@@ -112,6 +104,30 @@ public class TestActivity extends Activity implements View.OnClickListener {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void downloadHttp(){
+        new HttpDownloader(new HttpDownloader.IDownload() {
+            @Override
+            public void onProgressUpdate(int progress) {}
+
+            @Override
+            public void onPostExecute(Response result) {
+                Log.i("terry", result.fileName + " get code: " + result.code);
+            }
+        }).execute("http://192.168.42.35/test_auth/test.html", "terry:terryy", "test.html");
+    }
+
+    private void downloadHttps(){
+        new HttpsDownloader(new HttpsDownloader.IDownload() {
+            @Override
+            public void onProgressUpdate(int progress) {}
+
+            @Override
+            public void onPostExecute(Response result) {
+                Log.i("terry", result.fileName + " get code: " + result.code);
+            }
+        }).execute("https://192.168.42.35/test_auth/test.html", "terry:terryy", "test.html");
     }
 
     private void enableBindingButton(final boolean enable) {

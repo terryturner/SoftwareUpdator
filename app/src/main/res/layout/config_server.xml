@@ -3,13 +3,44 @@
     android:layout_width="match_parent" android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/label_server_address"
+        android:id="@+id/label_server_protocol"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
-        android:text="Server Address" />
+        android:text="@string/pref_label_server_protocol" />
+
+    <RadioGroup
+        android:id="@+id/radio_server_protocol"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/label_server_protocol"
+        android:orientation="horizontal"
+        android:layout_margin="10dp">
+
+        <RadioButton
+            android:id="@+id/radio_protocol_http"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pref_option_server_protocol_http"/>
+
+        <RadioButton
+            android:id="@+id/radio_protocol_https"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pref_option_server_protocol_https"/>
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/label_server_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/radio_server_protocol"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:text="@string/pref_label_server_url" />
 
     <EditText
         android:id="@+id/edit_server_address"
@@ -32,7 +63,7 @@
         android:layout_below="@+id/edit_server_address"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
-        android:text="Server Account" />
+        android:text="@string/pref_label_server_account" />
 
     <EditText
         android:id="@+id/edit_server_account"
@@ -53,7 +84,7 @@
         android:layout_below="@+id/edit_server_account"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
-        android:text="Server Password" />
+        android:text="@string/pref_label_server_password" />
 
     <EditText
         android:id="@+id/edit_server_password"
