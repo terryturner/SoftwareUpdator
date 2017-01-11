@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Validate>
+    <Setting>
+        <MailFrom>
+            <mail>moncatman@gmail.com</mail>
+            <password>testaccount</password>
+        </MailFrom>
+        <MailTo>
+            <mail>123@mail.com</mail>
+            <mail>456@mail.com</mail>
+            <NoUse>
+                <Test>test</Test>
+            </NoUse>
+        </MailTo>
+        <MailTo>
+            <mail>789@mail.com</mail>
+            <mail>789#mail.com</mail>
+        </MailTo>
+    </Setting>
+    <Application>
+        <packageName>com.goldtek.sw.updater</packageName>
+        <versionCode>11</versionCode>
+        <deployTime>2017/02/14-00:30</deployTime>
+        <url>http://www.colorado.edu/conflict/peace/download/peace_essay.ZIP</url>
+    </Application>
+    <Application>
+        <packageName>com.test.app1</packageName>
+        <versionCode>test</versionCode>
+        <deployTime>1960/01/01-00:00</deployTime>
+        <url>rtsp://www.colorado.edu/conflict/peace/download/peace_essay.ZIP</url>
+    </Application>
+    <NoUse>
+        <test>test</test>
+    </NoUse>
+</Validate>

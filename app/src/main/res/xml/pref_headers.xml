@@ -1,0 +1,24 @@
+<preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- These settings headers are only used on tablets. -->
+
+    <header
+        android:fragment="com.goldtek.sw.updater.SettingsActivity$SettingPreferenceFragment"
+        android:icon="@drawable/ic_settings_black_24dp"
+        android:title="@string/pref_header_setting" />
+
+    <header
+        android:fragment="com.goldtek.sw.updater.SettingsActivity$InformationPreferenceFragment"
+        android:icon="@drawable/ic_info_black_24dp"
+        android:title="@string/pref_header_information" />
+
+    <header
+        android:id="@+id/com.goldtek.sw.updater.SyncNow"
+        android:icon="@drawable/ic_sync_black_24dp"
+        android:title="@string/pref_header_sync_now" />
+
+    <header
+        android:id="@+id/com.goldtek.sw.updater.Logout"
+        android:icon="@drawable/ic_logout_black_24dp"
+        android:title="@string/pref_header_logout" />
+</preference-headers>

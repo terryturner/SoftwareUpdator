@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/label_server_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:text="Server Address" />
+
+    <EditText
+        android:id="@+id/edit_server_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/label_server_address"
+        android:layout_margin="10dp"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:inputType="textUri"
+        android:background="@drawable/edittext_border" />
+
+    <TextView
+        android:id="@+id/label_server_account"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edit_server_address"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:text="Server Account" />
+
+    <EditText
+        android:id="@+id/edit_server_account"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/label_server_account"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:background="@drawable/edittext_border"
+        android:layout_margin="10dp" />
+
+    <TextView
+        android:id="@+id/label_server_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edit_server_account"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:text="Server Password" />
+
+    <EditText
+        android:id="@+id/edit_server_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/label_server_password"
+        android:layout_margin="10dp"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:inputType="textPassword"
+        android:background="@drawable/edittext_border" />
+</RelativeLayout>

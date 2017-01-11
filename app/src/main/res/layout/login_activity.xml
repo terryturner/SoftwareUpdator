@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/loginText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textVisiblePassword"
+        android:hint="@string/login_hint"
+        android:textSize="24sp"
+        android:layout_centerInParent="true" />
+
+    <Button
+        android:id="@+id/loginSubmit"
+        android:layout_below="@+id/loginText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true"
+        android:text="@string/login_submit"/>
+</RelativeLayout>

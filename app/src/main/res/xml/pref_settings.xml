@@ -1,0 +1,31 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="update_auto"
+        android:title="@string/pref_title_update_auto" />
+
+    <ListPreference
+        android:defaultValue="180"
+        android:entries="@array/pref_sync_frequency_titles"
+        android:entryValues="@array/pref_sync_frequency_values"
+        android:key="sync_frequency"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:title="@string/pref_title_sync_frequency" />
+
+    <!-- NOTE: EditTextPreference accepts EditText attributes. -->
+    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
+    <EditTextPreference
+        android:capitalize="none"
+        android:defaultValue="@string/pref_default_server"
+        android:inputType="textUri"
+        android:key="primary_server_url"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_primary_server" />
+
+    <com.goldtek.sw.updater.Preference.ServerPreference
+        android:title="@string/pref_title_primary_server" />
+</PreferenceScreen>

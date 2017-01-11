@@ -1,0 +1,26 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Preference
+        android:title="@string/pref_title_last_sync_time"
+        android:key="last_sync_time" />
+
+    <com.goldtek.sw.updater.Preference.MaintenancePreference
+        android:title="@string/pref_title_last_sync_success_time"
+        android:key="last_success_time"
+        android:positiveButtonText="@string/dialog_ok"
+        android:negativeButtonText="@null" />
+
+    <com.goldtek.sw.updater.Preference.AvailablePreference
+        android:title="@string/pref_title_available_updates"
+        android:key="available_updates"
+        android:positiveButtonText="@string/dialog_ok"
+        android:negativeButtonText="@null" />
+
+    <com.goldtek.sw.updater.Preference.ReportPreference
+        android:title="@string/pref_title_log"
+        android:key="log_info"
+        android:dialogMessage="@string/pref_message_log"
+        android:positiveButtonText="@string/pref_report_log"
+        android:negativeButtonText="@string/pref_clear_log" />
+
+</PreferenceScreen>

@@ -1,0 +1,76 @@
+<resources>
+    <string name="app_name">SoftwareUpdater</string>
+    <string name="login_hint">Auth Password</string>
+    <string name="login_submit">Send</string>
+
+    <string name="page_test_name">Test Updater</string>
+    <string name="page_setting_name">Software Updater</string>
+
+    <string name="pref_header_sync_now">Sync Now</string>
+    <string name="pref_header_logout">User Logout</string>
+
+    <!-- Strings related to Settings -->
+    <string name="pref_header_setting">Setting</string>
+    <string name="pref_title_update_auto">Auto update</string>
+    <string name="pref_summary_update_auto">Enable auto-update function or not</string>
+
+    <string name="pref_title_primary_server">Primary Server</string>
+    <string name="pref_title_secondary_server">Secondary Server</string>
+    <string name="pref_title_tertiary_server">Tertiary Server</string>
+    <string name="pref_default_server">192.168.42.35</string>
+
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>1 minutes</item>
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>6 hours</item>
+        <item>Every day</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>1</item>
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>1440</item>
+    </string-array>
+
+    <string name="pref_title_system_sync_settings">System sync settings</string>
+
+
+    <string name="pref_header_information">Information</string>
+    <string name="pref_title_last_sync_time">Last Sync Time</string>
+    <string name="pref_title_last_sync_success_time">Last Sync Success Time</string>
+    <string name="pref_title_available_updates">Available updates</string>
+    <string name="pref_summary_available_updates">APP updates are available now</string>
+    <string name="pref_title_log">Log file</string>
+    <string name="pref_message_log">Do you want to send or delete report?</string>
+    <string name="pref_clear_log">Clear</string>
+    <string name="pref_report_log">Report</string>
+
+    <!-- Example settings for Notifications -->
+    <string name="pref_title_new_message_notifications">New message notifications</string>
+    <string name="pref_title_ringtone">Ringtone</string>
+    <string name="pref_ringtone_silent">Silent</string>
+    <string name="pref_title_vibrate">Vibrate</string>
+    <string name="pref_title_back">Back</string>
+
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_update_title">Update Now</string>
+    <string name="dialog_update_msg">Please wait...</string>
+    <string name="dialog_download_fail_format">Download File fail (%1$d): %2$s</string>
+    <string name="dialog_install_success_format">Update %1$s success.</string>
+    <string name="dialog_install_fail_format">Install %1$s fail: %2$d</string>
+
+    <string name="msg_user_login">User Login</string>
+    <string name="msg_user_logout">User Exit</string>
+    <string name="msg_user_report_format">User report now. Current version is %1$d</string>
+    <string name="msg_user_sync_fail_format">User download Fail (%1$d): %2$s</string>
+    <string name="msg_user_install_format">User onPackageInstall (%1$d): %2$s</string>
+    <string name="msg_schedule_sync_fail_format">ScheduleService Sync Fail (%1$d): %2$s</string>
+    <string name="msg_schedule_install_format">ScheduleService onPackageInstall(%1$d): %2$s</string>
+</resources>

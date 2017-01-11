@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button android:id="@+id/stress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="stress" />
+
+    <Button android:id="@+id/config"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="config" />
+
+    <Button android:id="@+id/start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="start" />
+
+    <Button android:id="@+id/stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="stop" />
+
+    <Button android:id="@+id/bind"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="bind" />
+
+    <Button android:id="@+id/unbind"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="unbind" />
+
+    <Button android:id="@+id/parseXML"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="parseXML" />
+
+    <Button android:id="@+id/download"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="download" />
+
+
+</LinearLayout>
