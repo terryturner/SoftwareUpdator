@@ -7,12 +7,13 @@ import android.util.Log;
 
 import com.goldtek.sw.updater.ScheduleService;
 import com.goldtek.sw.updater.model.ReportHandler;
+import com.goldtek.sw.updater.presenter.PackageManager;
 
 public class RestartReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.i("terry", "onReceive : " + intent.getAction());
+        //Log.i("terry", "onReceive : " + intent.getAction());
 
         if (intent.getAction().equalsIgnoreCase(Intent.ACTION_BOOT_COMPLETED)) 
         {
@@ -21,7 +22,7 @@ public class RestartReceiver extends BroadcastReceiver {
 
         if (intent.getAction().equals(Intent.ACTION_PACKAGE_REPLACED)) {
             if (intent.getDataString().equals("package:com.goldtek.sw.updater")) {
-                startSticky(context, "software updater is replaced");
+                startSticky(context, "software updater is upgrade to " + PackageManager.getInstance().getApplicationInfo().versionCode);
             }
         }
 

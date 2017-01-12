@@ -34,7 +34,7 @@ public class ConfigManager {
 
     public final static String KEY_PACKAGE_NAME = "packageName";
 
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private static final ConfigManager sInstance = new ConfigManager(GoldtekApplication.getContext());
 
     public static ConfigManager getInstance() {

@@ -61,9 +61,9 @@ public class ReportPreference extends PopupPreference implements DialogInterface
                 mail.setBody(GoldtekApplication.sDateFormat.format(new Date(System.currentTimeMillis())));
                 mail.set_to(setting.getReceivers().toArray(new String[0]));
                 try {
-                    mail.addAttachment(ReportHandler.getInstance().getPath());
-                } catch (Exception e) {
-                }
+                    mail.addAttachment(ReportHandler.getInstance().getPath(), "log.txt");
+                    mail.addAttachment(GoldtekApplication.getContext().getFilesDir()+"/sample.xml", "main.xml");
+                } catch (Exception e) {}
                 new MailSender().execute(mail);
             } else {
                 Toast.makeText(getContext(), "Report fail", Toast.LENGTH_LONG).show();

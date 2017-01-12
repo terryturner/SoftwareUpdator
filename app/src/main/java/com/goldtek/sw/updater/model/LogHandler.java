@@ -1,5 +1,7 @@
 package com.goldtek.sw.updater.model;
 
+import android.util.Log;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;

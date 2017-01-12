@@ -15,7 +15,7 @@ import java.io.IOException;
  */
 
 public class ReportHandler extends LogHandler {
-    private final static String FILE_NAME = "report.log";
+    public final static String FILE_NAME = "report.log";
     private final static String PATH = GoldtekApplication.getContext().getFilesDir().getPath();
 
     private static ReportHandler sInstance = new ReportHandler();
@@ -48,6 +48,7 @@ public class ReportHandler extends LogHandler {
     public void clearFile() {
         File file = new File(PATH+"/"+FILE_NAME);
         file.delete();
+        writeMessage("User clear the report");
     }
 
     public void writeMessageFormat(int resId, Object... args) {
@@ -114,6 +115,8 @@ public class ReportHandler extends LogHandler {
         @Override
         protected String doInBackground(StringBuffer... params) {
             if (params[0] != null) {
+                checkFile(PATH+"/"+FILE_NAME);
+
                 writeLog(params[0]);
             }
             return "";
