@@ -32,7 +32,9 @@ public class ConfigManager {
     public final static String KEY_PRIMARY_SERVER_ACCOUNT = "primary_server_account";
     public final static String KEY_PRIMARY_SERVER_PASSWORD = "primary_server_password";
 
-    private static final boolean DEBUG = false;
+    public final static String KEY_PACKAGE_NAME = "packageName";
+
+    private static final boolean DEBUG = true;
     private static final ConfigManager sInstance = new ConfigManager(GoldtekApplication.getContext());
 
     public static ConfigManager getInstance() {
@@ -208,7 +210,7 @@ public class ConfigManager {
     }
 
     public String getPrimaryServerAuth() {
-        return mPrimaryServerAccount + ":" +mPrimaryServerPwd;
+        return mPrimaryServerAccount + ":" + mPrimaryServerPwd;
     }
 
     public boolean needPrimaryServerAuth() { return (mPrimaryServerAccount != null && mPrimaryServerPwd != null && !mPrimaryServerAccount.isEmpty() && !mPrimaryServerPwd.isEmpty()); }

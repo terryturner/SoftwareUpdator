@@ -18,6 +18,8 @@ public final class XmlApplicationItem extends MaintainItem {
     private int versionCode = -1;
     private Date deployTime = new Date();
     private Uri uri = Uri.parse("");
+    private String auth_account = null;
+    private String auth_password = null;
 
     public XmlApplicationItem() {
         super(2);
@@ -27,13 +29,29 @@ public final class XmlApplicationItem extends MaintainItem {
     public void setVersionCode(int ver) { versionCode = ver; }
     public void setDeployTime(Date date) { deployTime = date; }
     public void setURL(Uri link) { uri = link; }
+    public void setAuthAccount(String account) { auth_account = account; }
+    public void setAuthPassword(String pwd) { auth_password = pwd; }
 
     public String getPackageName() { return packageName; }
     public int getVersionCode() { return versionCode; }
     public Date getDeployTime() { return deployTime; }
     public Uri getUrl() { return uri; }
+    public String getAuthAccount() { return auth_account; }
+    public String getAuthPassword() { return auth_password; }
+    public String getAuth() {
+        return auth_account + ":" + auth_password;
+    }
+
     public boolean isUpdater() {
         return GoldtekApplication.getContext().getPackageName().equals(packageName);
+    }
+
+    public boolean isValidPackageName() {
+        return packageName != null && !packageName.isEmpty();
+    }
+
+    public boolean needAuthentication() {
+        return auth_account != null && auth_password != null && !auth_account.isEmpty() && !auth_password.isEmpty();
     }
 
     @Override
@@ -42,7 +60,11 @@ public final class XmlApplicationItem extends MaintainItem {
         Log.i("terry", "name: " + packageName + " ver: " + versionCode);
         if (deployTime != null)
             Log.i("terry", "time: " + GoldtekApplication.sDateFormat.format(deployTime));
-        Log.i("terry", "url: " + uri);
-        Log.i("terry", "---***************---");
+        if (needAuthentication())
+            Log.i("terry", String.format("auth url: %s , acc: %s:%s", uri, auth_account, auth_password));
+        else
+            Log.i("terry", String.format("basic url: %s", uri));
+        Log.i("terry", "---------------------");
+        Log.i("terry", " ");
     }
 }

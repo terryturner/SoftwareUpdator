@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:padding="10dp">
 
     <TextView
         android:id="@+id/label_server_protocol"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"
         android:text="@string/pref_label_server_protocol" />
 
     <RadioGroup
@@ -18,7 +17,7 @@
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/label_server_protocol"
         android:orientation="horizontal"
-        android:layout_margin="10dp">
+        android:layout_marginTop="10dp">
 
         <RadioButton
             android:id="@+id/radio_protocol_http"
@@ -39,7 +38,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/radio_server_protocol"
         android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"
         android:text="@string/pref_label_server_url" />
 
     <EditText
@@ -48,7 +46,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/label_server_address"
-        android:layout_margin="10dp"
+        android:layout_marginTop="10dp"
         android:maxLines="1"
         android:selectAllOnFocus="true"
         android:singleLine="true"
@@ -62,7 +60,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/edit_server_address"
         android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"
         android:text="@string/pref_label_server_account" />
 
     <EditText
@@ -71,11 +68,11 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/label_server_account"
+        android:layout_marginTop="10dp"
         android:maxLines="1"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:background="@drawable/edittext_border"
-        android:layout_margin="10dp" />
+        android:background="@drawable/edittext_border" />
 
     <TextView
         android:id="@+id/label_server_password"
@@ -83,7 +80,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/edit_server_account"
         android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"
         android:text="@string/pref_label_server_password" />
 
     <EditText
@@ -92,7 +88,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/label_server_password"
-        android:layout_margin="10dp"
+        android:layout_marginTop="10dp"
         android:maxLines="1"
         android:selectAllOnFocus="true"
         android:singleLine="true"

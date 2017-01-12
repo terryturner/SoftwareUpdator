@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,11 +21,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.goldtek.sw.updater.R;
-import com.goldtek.sw.updater.data.Response;
+import com.goldtek.sw.updater.data.GetResponse;
+import com.goldtek.sw.updater.data.PmRequest;
 import com.goldtek.sw.updater.data.xml.MaintainItem;
 import com.goldtek.sw.updater.data.xml.XmlApplicationItem;
 import com.goldtek.sw.updater.model.ReportHandler;
 import com.goldtek.sw.updater.model.ScheduleHandler;
+import com.goldtek.sw.updater.model.XmlParser;
 import com.goldtek.sw.updater.presenter.ConfigManager;
 import com.goldtek.sw.updater.presenter.PackageManager;
 
@@ -89,7 +92,7 @@ public class AvailablePreference extends PopupPreference implements AdapterView.
         super.onPrepareDialogBuilder(builder);
         mExecuteThread = new HandlerThread("executor");
         mExecuteThread.start();
-        mExecutor = new ScheduleHandler(mExecuteThread.getLooper());
+        mExecutor = new ScheduleHandler(mExecuteThread.getLooper(), getContext());
         mExecutor.setListener(this);
     }
 
@@ -108,7 +111,8 @@ public class AvailablePreference extends PopupPreference implements AdapterView.
         for (MaintainItem item : ConfigManager.getInstance().getMaintenance()) {
             if (item.isApplicationClass()) {
                 XmlApplicationItem app = (XmlApplicationItem) item;
-                if (PackageManager.getInstance().isAvailableUpdate(app.getPackageName(), app.getVersionCode()))
+                if (PackageManager.getInstance().isAvailableUpdate(app.getPackageName(), app.getVersionCode())
+                        && app.isValidPackageName() && XmlParser.isValidUrl(app.getUrl().toString()))
                     mApplications.add(app);
             }
         }
@@ -125,13 +129,16 @@ public class AvailablePreference extends PopupPreference implements AdapterView.
     }
 
     @Override
-    public void onPostExecute(Response result) {
-        if (result.code == HttpURLConnection.HTTP_OK) {
-            Message.obtain(mExecutor, ScheduleHandler.INSTALL_APK_FILE, result).sendToTarget();
+    public void onPostExecute(GetResponse result) {
+        Log.i("terry", result.Code + " : " + result.Request.FileName);
+        if (result.isHttpOK()) {
+            PmRequest request = new PmRequest(result.Request.getOption(ConfigManager.KEY_PACKAGE_NAME), result.FilePath);
+            Message.obtain(mExecutor, ScheduleHandler.INSTALL_APK_FILE, request).sendToTarget();
         } else {
             mProgress.dismiss();
-            showResult(String.format(getContext().getString(R.string.dialog_download_fail_format), result.code, result.packageName));
-            ReportHandler.getInstance().writeMessageFormat(R.string.msg_user_sync_fail_format, result.code, result.request);
+
+            showResult(String.format(getContext().getString(R.string.dialog_download_fail_format), result.Code, result.Request.getOption(ConfigManager.KEY_PACKAGE_NAME)));
+            ReportHandler.getInstance().writeMessageFormat(R.string.msg_user_sync_fail_format, result.Code, result.Request.RequestURL);
         }
     }
 

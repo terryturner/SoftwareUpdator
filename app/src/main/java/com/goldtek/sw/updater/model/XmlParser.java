@@ -31,12 +31,14 @@ public class XmlParser {
     private static final String TAG_MailFrom = "MailFrom";
     private static final String TAG_MailTo = "MailTo";
     private static final String TAG_mail = "mail";
+    private static final String TAG_account = "account";
     private static final String TAG_password = "password";
     private static final String TAG_Application = "Application";
     private static final String TAG_packageName = "packageName";
     private static final String TAG_versionCode = "versionCode";
     private static final String TAG_deployTime = "deployTime";
     private static final String TAG_url = "url";
+
 
     public List<MaintainItem> parse(InputStream in) throws XmlPullParserException, IOException {
         try {
@@ -116,7 +118,7 @@ public class XmlParser {
                 continue;
             }
             String name = parser.getName();
-            if (name.equals(TAG_mail)) {
+            if (name.equals(TAG_account)) {
                 String value = parser.nextText();
                 if (isValidEmail(value)) item.setSender(value);
             } else if (name.equals(TAG_password)) {
@@ -153,6 +155,12 @@ public class XmlParser {
             } else if (name.equals(TAG_url)) {
                 String value = parser.nextText();
                 if (isValidUrl(value)) item.setURL(Uri.parse(value));
+            } else if (name.equals(TAG_account)) {
+                String value = parser.nextText();
+                item.setAuthAccount(value);
+            } else if (name.equals(TAG_password)) {
+                String value = parser.nextText();
+                item.setAuthPassword(value);
             } else {
                 skip(parser);
             }
@@ -184,5 +192,13 @@ public class XmlParser {
 
     public final static boolean isValidUrl(String target) {
         return URLUtil.isHttpUrl(target) || URLUtil.isHttpsUrl(target);
+    }
+
+    public final static boolean isHttpUrl(String target) {
+        return URLUtil.isHttpUrl(target);
+    }
+
+    public final static boolean isHttpsUrl(String target) {
+        return URLUtil.isHttpsUrl(target);
     }
 }

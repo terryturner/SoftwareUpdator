@@ -28,11 +28,15 @@ public final class XmlSettingItem extends MaintainItem {
     public String getPassword() { return mPWD; }
     public List<String> getReceivers() { return mReceivers; }
 
+    public boolean isValidSender() {
+        return mSender != null && mPWD != null && !mSender.isEmpty() && !mSender.isEmpty();
+    }
+
     @Override
     public void debug() {
         Log.i("terry", "---SettingItem---");
         Log.i("terry", mSender + "  /  " + mPWD);
         for (String address : mReceivers) Log.i("terry", address);
-        Log.i("terry", "---***********---");
+        Log.i("terry", "---------------------");
     }
 }

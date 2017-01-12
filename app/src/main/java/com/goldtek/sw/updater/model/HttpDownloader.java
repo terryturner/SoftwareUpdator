@@ -1,7 +1,6 @@
 package com.goldtek.sw.updater.model;
 
 import java.io.BufferedInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,14 +10,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.util.Base64;
 import android.util.Log;
 
 import com.goldtek.sw.updater.GoldtekApplication;
-import com.goldtek.sw.updater.data.Response;
+import com.goldtek.sw.updater.data.GetRequest;
+import com.goldtek.sw.updater.data.GetResponse;
 
-public class HttpDownloader extends AsyncTask<String, String, Response> {
+public class HttpDownloader extends AsyncTask<GetRequest, String, GetResponse> {
     public final static int ERROR_MalformedURLException = 1;
     public final static int ERROR_openConnection = 2;
     public final static int ERROR_connection = 3;
@@ -28,11 +27,12 @@ public class HttpDownloader extends AsyncTask<String, String, Response> {
     public final static int ERROR_NoSuchAlgorithmException = 7;
     public final static int ERROR_KeyManagementException = 8;
 
+    public final static String KEY_AUTH = "loginPassword";
     protected final static String TAG = "HTTP_Download";
 
     public interface IDownload {
         void onProgressUpdate(int progress);
-        void onPostExecute(Response result);
+        void onPostExecute(GetResponse result);
     }
 
     protected IDownload listener = null;
@@ -40,35 +40,35 @@ public class HttpDownloader extends AsyncTask<String, String, Response> {
         this.listener = listener;
     }
 
-
     /**
      * Downloading file in background thread
      * */
     @Override
-    protected Response doInBackground(String... param) {
-        Response result = new Response("");
+    protected GetResponse doInBackground(GetRequest... param) {
+        if (param.length != 1) return new GetResponse(null);
+
+        GetRequest request = param[0];
+        GetResponse response = new GetResponse(request);
 
         int count;
-        String loginPassword = (param.length == 3) ? param[1] : null;
-        result.fileName = (param.length == 3) ? param[2] : param[1];
-        String downloadPath = GoldtekApplication.getContext().getFilesDir() + "/" + result.fileName;
-        result.filePath = downloadPath;
+
+        String loginPassword = request.getOption(KEY_AUTH);
+        response.FilePath = GoldtekApplication.getContext().getFilesDir() + "/" + request.FileName;
 
         URL url = null;
         try {
-            result.request = param[0];
-            url = new URL(result.request);
+            url = new URL(request.RequestURL);
         } catch (MalformedURLException e) {
-            result.code = ERROR_MalformedURLException;
-            return result;
+            response.Code = ERROR_MalformedURLException;
+            return response;
         }
 
         HttpURLConnection connection = null;
         try {
             connection = (HttpURLConnection) url.openConnection();
         } catch (IOException e) {
-            result.code = ERROR_openConnection;
-            return result;
+            response.Code = ERROR_openConnection;
+            return response;
         }
 
         if (loginPassword != null) {
@@ -81,23 +81,23 @@ public class HttpDownloader extends AsyncTask<String, String, Response> {
         try {
             connection.connect();
         } catch (IOException e) {
-            result.code = ERROR_connection;
-            return result;
+            response.Code = ERROR_connection;
+            return response;
 
         }
 
         try {
-            result.code = connection.getResponseCode();
+            response.Code = connection.getResponseCode();
         } catch (IOException e) {
-            result.code = ERROR_getResponseCode;
+            response.Code = ERROR_getResponseCode;
             connection.disconnect();
-            return result;
+            return response;
         }
 
-        if (result.code != HttpURLConnection.HTTP_OK) {
-            Log.i(TAG, "fail code: " + result.code);
+        if (!response.isHttpOK()) {
+            Log.i(TAG, "fail code: " + response.Code);
             connection.disconnect();
-            return result;
+            return response;
         }
 
         // this will be useful so that you can show a tipical 0-100% progress bar
@@ -108,16 +108,15 @@ public class HttpDownloader extends AsyncTask<String, String, Response> {
         try {
             input = new BufferedInputStream(connection.getInputStream(), 8192);
         } catch (IOException e) {
-            result.code = ERROR_getInputStream;
+            response.Code = ERROR_getInputStream;
             connection.disconnect();
-            return result;
+            return response;
         }
 
         // Output stream
-        //String downloadPath = Environment.getExternalStorageDirectory() + "/Download/" + result.fileName;
         OutputStream output = null;
         try {
-            output = new FileOutputStream(downloadPath);
+            output = new FileOutputStream(response.FilePath);
 
             byte data[] = new byte[8192];
             long total = 0;
@@ -134,17 +133,14 @@ public class HttpDownloader extends AsyncTask<String, String, Response> {
             output.close();
             input.close();
 
-        } catch (FileNotFoundException e) {
-            result.code = ERROR_saveFile;
-            return result;
         } catch (IOException e) {
-            result.code = ERROR_saveFile;
-            return result;
+            response.Code = ERROR_saveFile;
+            return response;
         } finally {
             connection.disconnect();
         }
 
-        return result;
+        return response;
 
     }
 
@@ -161,7 +157,7 @@ public class HttpDownloader extends AsyncTask<String, String, Response> {
      * After completing background task Dismiss the progress dialog
      * **/
     @Override
-    protected void onPostExecute(Response result)
+    protected void onPostExecute(GetResponse result)
     {
         if (listener != null)
             listener.onPostExecute(result);

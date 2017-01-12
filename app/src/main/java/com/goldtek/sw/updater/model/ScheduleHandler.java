@@ -1,16 +1,19 @@
 package com.goldtek.sw.updater.model;
 
+import android.content.Context;
 import android.content.pm.IPackageInstallObserver;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
+import android.util.Log;
 
 import com.goldtek.sw.updater.GoldtekApplication;
 import com.goldtek.sw.updater.R;
+import com.goldtek.sw.updater.data.GetRequest;
+import com.goldtek.sw.updater.data.PmRequest;
 import com.goldtek.sw.updater.data.Protocol;
-import com.goldtek.sw.updater.data.Response;
+import com.goldtek.sw.updater.data.GetResponse;
 import com.goldtek.sw.updater.data.xml.XmlApplicationItem;
 import com.goldtek.sw.updater.data.xml.MaintainItem;
 import com.goldtek.sw.updater.presenter.ConfigManager;
@@ -38,21 +41,19 @@ public class ScheduleHandler extends Handler implements HttpDownloader.IDownload
     public static final int INSTALL_APK_FILE = 6;
 
     public interface Listener {
-        void onPostExecute(Response result);
+        void onPostExecute(GetResponse result);
         void onPackageInstall(String packageName, int returnCode);
     }
 
-    //private HttpDownloader.IDownload mDownloadCB = null;
-//    public void setHttpDownloadCallback(HttpDownloader.IDownload cb) {
-//        mDownloadCB = cb;
-//    }
+    private Context mContext;
     private Listener mListener = null;
     public void setListener(Listener l) {
         mListener = l;
     }
 
-    public ScheduleHandler(Looper looper) {
+    public ScheduleHandler(Looper looper, Context context) {
         super(looper);
+        mContext = context;
     }
 
     private IPackageInstallObserver mInstallObserver = new IPackageInstallObserver.Stub() {
@@ -69,7 +70,7 @@ public class ScheduleHandler extends Handler implements HttpDownloader.IDownload
 
     @Override
     public void handleMessage(Message msg) {
-        Response result;
+        GetResponse result;
         File file;
         switch (msg.what) {
             case POST_AUTO_UPDATE:
@@ -86,24 +87,25 @@ public class ScheduleHandler extends Handler implements HttpDownloader.IDownload
                 Protocol protocol = ConfigManager.getInstance().getPrimaryProtocol();
 
                 if (ip != null) {
+                    GetRequest request;
                     switch (protocol) {
                         case HTTP:
                             if (ConfigManager.getInstance().needPrimaryServerAuth()) {
-                                new HttpDownloader(this).execute(String.format(
-                                        GoldtekApplication.getContext().getString(R.string.url_http_auth_xml_format), ip),
-                                        ConfigManager.getInstance().getPrimaryServerAuth(), XML_FILE);
+                                request = new GetRequest(String.format(mContext.getString(R.string.url_http_auth_xml_format), ip), XML_FILE);
+                                request.setOption(HttpDownloader.KEY_AUTH, ConfigManager.getInstance().getPrimaryServerAuth());
                             } else {
-                                new HttpDownloader(this).execute(String.format(GoldtekApplication.getContext().getString(R.string.url_http_xml_format), ip), XML_FILE);
+                                request = new GetRequest(String.format(mContext.getString(R.string.url_http_xml_format), ip), XML_FILE);
                             }
+                            new HttpDownloader(this).execute(request);
                             break;
                         case HTTPS:
                             if (ConfigManager.getInstance().needPrimaryServerAuth()) {
-                                new HttpsDownloader(this).execute(String.format(
-                                        GoldtekApplication.getContext().getString(R.string.url_https_auth_xml_format), ip),
-                                        ConfigManager.getInstance().getPrimaryServerAuth(), XML_FILE);
+                                request = new GetRequest(String.format(mContext.getString(R.string.url_https_auth_xml_format), ip), XML_FILE);
+                                request.setOption(HttpDownloader.KEY_AUTH, ConfigManager.getInstance().getPrimaryServerAuth());
                             } else {
-                                new HttpsDownloader(this).execute(String.format(GoldtekApplication.getContext().getString(R.string.url_https_xml_format), ip), XML_FILE);
+                                request = new GetRequest(String.format(mContext.getString(R.string.url_https_xml_format), ip), XML_FILE);
                             }
+                            new HttpsDownloader(this).execute(request);
                             break;
                     }
                 }
@@ -111,26 +113,27 @@ public class ScheduleHandler extends Handler implements HttpDownloader.IDownload
                 break;
             case PARSE_XML_FILE:
                 XmlParser parser = new XmlParser();
-                if (msg.obj != null && msg.obj instanceof Response) {
-                    result = (Response) msg.obj;
-                    file = new File(result.filePath);
+                if (msg.obj != null && msg.obj instanceof GetResponse) {
+                    result = (GetResponse) msg.obj;
+                    file = new File(result.FilePath);
                     try {
                         ConfigManager.getInstance().setMaintenance(parser.parse(new FileInputStream(file)));
                     } catch (XmlPullParserException e) {
                         e.printStackTrace();
+                        //TODO: send mail while parse exception
+                        ReportHandler.getInstance().writeMessage(String.format(mContext.getString(R.string.msg_schedule_parse_fail_format), ConfigManager.getInstance().getLastSuccessTime(GoldtekApplication.sDateFormat)));
+                        ReportHandler.getInstance().writeException(e);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
-                //TODO: error parse report
                 break;
             case CHK_UPDATER_AVAILABLE:
                 for (MaintainItem item : ConfigManager.getInstance().getMaintenance()) {
                     if (item instanceof XmlApplicationItem) {
                         XmlApplicationItem app = (XmlApplicationItem) item;
                         if (app.isUpdater() && PackageManager.getInstance().isAvailableUpdate(app.getPackageName(), app.getVersionCode())) {
-                            if (XmlParser.isValidUrl(app.getUrl().toString()))
-                                new ApkDownloader(this, app.getPackageName()).execute(app.getUrl().toString(), app.getPackageName() + ".apk");
+                            Message.obtain(this, GET_APK_FILE, app).sendToTarget();
                         }
                     }
                 }
@@ -138,19 +141,29 @@ public class ScheduleHandler extends Handler implements HttpDownloader.IDownload
             case GET_APK_FILE:
                 if (msg.obj != null && msg.obj instanceof XmlApplicationItem) {
                     XmlApplicationItem app = (XmlApplicationItem) msg.obj;
-                    if (XmlParser.isValidUrl(app.getUrl().toString()))
-                        new ApkDownloader(this, app.getPackageName()).execute(app.getUrl().toString(), app.getPackageName() + ".apk");
+                    if (app.isValidPackageName()) {
+                        GetRequest request = new GetRequest(app.getUrl().toString(), app.getPackageName() + ".apk");
+                        request.setOption(ConfigManager.KEY_PACKAGE_NAME, app.getPackageName());
+                        if (app.needAuthentication())
+                            request.setOption(HttpDownloader.KEY_AUTH, app.getAuth());
+
+                        if (XmlParser.isHttpUrl(app.getUrl().toString())) {
+                            new HttpDownloader(this).execute(request);
+                        } else if (XmlParser.isHttpsUrl(app.getUrl().toString())) {
+                            new HttpsDownloader(this).execute(request);
+                        }
+                    }
                 }
                 break;
             case INSTALL_APK_FILE:
-                if (msg.obj != null && msg.obj instanceof Response) {
-                    result = (Response) msg.obj;
-                    file = new File(result.filePath);
+                if (msg.obj != null && msg.obj instanceof PmRequest) {
+                    file = new File(((PmRequest) msg.obj).FilePath);
+
                     try {
-                        PackageManager.getInstance().installPackage(file, 0x00000002, result.packageName, mInstallObserver);
+                        PackageManager.getInstance().installPackage(file, 0x00000002, ((PmRequest) msg.obj).packageName, mInstallObserver);
                     } catch (Exception e) {
-                        e.printStackTrace();
-                        if (mListener != null) mListener.onPackageInstall(result.packageName, android.content.pm.PackageManager.PERMISSION_DENIED);
+                        if (mListener != null) mListener.onPackageInstall(((PmRequest) msg.obj).packageName,
+                                android.content.pm.PackageManager.PERMISSION_DENIED);
                     }
                 }
                 break;
@@ -164,7 +177,9 @@ public class ScheduleHandler extends Handler implements HttpDownloader.IDownload
     public void onProgressUpdate(int progress) {}
 
     @Override
-    public void onPostExecute(Response result) {
+    public void onPostExecute(GetResponse result) {
         if (mListener != null) mListener.onPostExecute(result);
     }
+
+
 }

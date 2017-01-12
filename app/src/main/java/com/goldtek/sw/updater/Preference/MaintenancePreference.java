@@ -54,18 +54,21 @@ public class MaintenancePreference extends PopupPreference {
 
                 MaintainItem item = mMaintenance.get(position);
                 StringBuilder msg = new StringBuilder();
-                //String msg = "";
+
                 if (item.isApplicationClass()) {
                     XmlApplicationItem app = (XmlApplicationItem) item;
 
-                    msg.append("<App>\n");
-                    msg.append(String.format("%s (%d)\n%s\n%s", app.getPackageName(), app.getVersionCode(), GoldtekApplication.sDateFormat.format(app.getDeployTime()), app.getUrl().toString()));
+                    msg.append(String.format(getContext().getString(R.string.dialog_info_app_format),
+                            app.getPackageName(), app.getVersionCode(),
+                            GoldtekApplication.sDateFormat.format(app.getDeployTime()),
+                            app.getUrl().toString(),
+                            app.getAuthAccount(), app.getAuthPassword()));
                     tv.setText(msg);
                 } else if (item.isSettingClass()) {
                     XmlSettingItem setting = (XmlSettingItem) item;
-                    msg.append("<Setting>\n");
 
-                    msg.append(String.format("Mail From:\n%s  -  %s\n\nMail To:\n", setting.getSender(), setting.getPassword()));
+                    msg.append(String.format(getContext().getString(R.string.dialog_info_setting_format),
+                            setting.getSender(), setting.getPassword()));
                     for (String address : setting.getReceivers()) {
                         msg.append(address + "\n");
                     }

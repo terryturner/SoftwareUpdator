@@ -1,11 +1,11 @@
 package com.goldtek.sw.updater.model;
 
-import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
 
 import com.goldtek.sw.updater.GoldtekApplication;
-import com.goldtek.sw.updater.data.Response;
+import com.goldtek.sw.updater.data.GetRequest;
+import com.goldtek.sw.updater.data.GetResponse;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -40,19 +40,23 @@ public class HttpsDownloader extends HttpDownloader {
      * Downloading file in background thread
      * */
     @Override
-    protected Response doInBackground(String... param) {
-        Response result = new Response("");
+    protected GetResponse doInBackground(GetRequest... param) {
+        if (param.length != 1) return new GetResponse(null);
+
+        GetRequest request = param[0];
+        GetResponse response = new GetResponse(request);
+
         //requestWithoutCA(result);
         //saveFileWithoutCA(result);
-        result = saveFileWithoutCAWithAuth(result, param);
+        response = saveFileWithoutCAWithAuth(response);
 
-        return result;
+        return response;
     }
 
     /**
      * Print https input stream without CA
      */
-    private void requestWithoutCA(Response result) {
+    private void requestWithoutCA(GetResponse result) {
         try {
 
             SSLContext sc = SSLContext.getInstance("TLS");
@@ -79,36 +83,32 @@ public class HttpsDownloader extends HttpDownloader {
             reader.close();
             // 断开连接
             urlConnection.disconnect();
-            result.code = 200;
+            result.Code = 200;
         } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
-            result.code = ERROR_getResponseCode;
+            result.Code = ERROR_getResponseCode;
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
-            result.code = ERROR_getResponseCode;
+            result.Code = ERROR_getResponseCode;
         } catch (NoSuchAlgorithmException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
-            result.code = ERROR_getResponseCode;
+            result.Code = ERROR_getResponseCode;
         } catch (KeyManagementException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
-            result.code = ERROR_getResponseCode;
+            result.Code = ERROR_getResponseCode;
         }
     }
 
     /**
      * Save https input stream to a file without CA
      */
-    private Response saveFileWithoutCA(Response result) {
+    private GetResponse saveFileWithoutCA(GetResponse result) {
         URL url = null;
         try {
-            result.request = "https://192.168.42.35/sample.xml";
-            url = new URL(result.request);
+            result.Request.RequestURL = "https://192.168.42.35/sample.xml";
+            url = new URL(result.Request.RequestURL);
         } catch (MalformedURLException e) {
-            result.code = ERROR_MalformedURLException;
+            result.Code = ERROR_MalformedURLException;
             return result;
         }
 
@@ -117,14 +117,14 @@ public class HttpsDownloader extends HttpDownloader {
         try {
             sc = SSLContext.getInstance("TLS");
         } catch (NoSuchAlgorithmException e) {
-            result.code = ERROR_NoSuchAlgorithmException;
+            result.Code = ERROR_NoSuchAlgorithmException;
             return result;
         }
 
         try {
             sc.init(null, new TrustManager[] { new FreeX509Manager() }, new SecureRandom());
         } catch (KeyManagementException e) {
-            result.code = ERROR_KeyManagementException;
+            result.Code = ERROR_KeyManagementException;
             return result;
         }
 
@@ -134,7 +134,7 @@ public class HttpsDownloader extends HttpDownloader {
         try {
             connection = (HttpURLConnection) url.openConnection();
         } catch (IOException e) {
-            result.code = ERROR_openConnection;
+            result.Code = ERROR_openConnection;
             return result;
         }
 
@@ -149,7 +149,7 @@ public class HttpsDownloader extends HttpDownloader {
             input = connection.getInputStream();
             reader = new BufferedReader(new InputStreamReader(input));
         } catch (IOException e) {
-            result.code = ERROR_getInputStream;
+            result.Code = ERROR_getInputStream;
             connection.disconnect();
             return result;
         }
@@ -170,10 +170,10 @@ public class HttpsDownloader extends HttpDownloader {
             input.close();
 
         } catch (FileNotFoundException e) {
-            result.code = ERROR_saveFile;
+            result.Code = ERROR_saveFile;
             return result;
         } catch (IOException e) {
-            result.code = ERROR_saveFile;
+            result.Code = ERROR_saveFile;
             return result;
         } finally {
             connection.disconnect();
@@ -184,18 +184,15 @@ public class HttpsDownloader extends HttpDownloader {
     /**
      * Save https input stream to a file without CA but with basic authentication
      */
-    private Response saveFileWithoutCAWithAuth(Response result, String... param) {
-        String loginPassword = (param.length == 3) ? param[1] : null;
-        result.fileName = (param.length == 3) ? param[2] : param[1];
-        String downloadPath = GoldtekApplication.getContext().getFilesDir() + "/" + result.fileName;
-        result.filePath = downloadPath;
+    private GetResponse saveFileWithoutCAWithAuth(GetResponse result) {
+        String loginPassword = result.Request.getOption(KEY_AUTH);
+        result.FilePath = GoldtekApplication.getContext().getFilesDir() + "/" + result.Request.FileName;
 
         URL url = null;
         try {
-            result.request = param[0];
-            url = new URL(result.request);
+            url = new URL(result.Request.RequestURL);
         } catch (MalformedURLException e) {
-            result.code = ERROR_MalformedURLException;
+            result.Code = ERROR_MalformedURLException;
             return result;
         }
 
@@ -203,14 +200,14 @@ public class HttpsDownloader extends HttpDownloader {
         try {
             sc = SSLContext.getInstance("TLS");
         } catch (NoSuchAlgorithmException e) {
-            result.code = ERROR_NoSuchAlgorithmException;
+            result.Code = ERROR_NoSuchAlgorithmException;
             return result;
         }
 
         try {
             sc.init(null, new TrustManager[] { new FreeX509Manager() }, new SecureRandom());
         } catch (KeyManagementException e) {
-            result.code = ERROR_KeyManagementException;
+            result.Code = ERROR_KeyManagementException;
             return result;
         }
 
@@ -220,7 +217,7 @@ public class HttpsDownloader extends HttpDownloader {
         try {
             connection = (HttpsURLConnection) url.openConnection();
         } catch (IOException e) {
-            result.code = ERROR_openConnection;
+            result.Code = ERROR_openConnection;
             return result;
         }
 
@@ -232,6 +229,20 @@ public class HttpsDownloader extends HttpDownloader {
         connection.setConnectTimeout(5000);
         connection.setReadTimeout(5000);
 
+        try {
+            result.Code = connection.getResponseCode();
+        } catch (IOException e) {
+            result.Code = ERROR_getResponseCode;
+            connection.disconnect();
+            return result;
+        }
+
+        if (!result.isHttpOK()) {
+            Log.i(TAG, "fail code: " + result.Code);
+            connection.disconnect();
+            return result;
+        }
+
         // Input stream
         InputStream input = null;
         BufferedReader reader = null;
@@ -239,24 +250,11 @@ public class HttpsDownloader extends HttpDownloader {
             input = connection.getInputStream();
             reader = new BufferedReader(new InputStreamReader(input));
         } catch (IOException e) {
-            result.code = ERROR_getInputStream;
+            result.Code = ERROR_getInputStream;
             connection.disconnect();
             return result;
         }
 
-        try {
-            result.code = connection.getResponseCode();
-        } catch (IOException e) {
-            result.code = ERROR_getResponseCode;
-            connection.disconnect();
-            return result;
-        }
-
-        if (result.code != HttpURLConnection.HTTP_OK) {
-            Log.i(TAG, "fail code: " + result.code);
-            connection.disconnect();
-            return result;
-        }
 
         // this will be useful so that you can show a tipical 0-100% progress bar
         int lengthOfFile = connection.getContentLength();
@@ -264,7 +262,7 @@ public class HttpsDownloader extends HttpDownloader {
         // Output stream
         PrintWriter output = null;
         try {
-            output = new PrintWriter(new FileWriter(downloadPath));
+            output = new PrintWriter(new FileWriter(result.FilePath));
             String line;
             long total = 0;
 
@@ -277,11 +275,8 @@ public class HttpsDownloader extends HttpDownloader {
             output.close();
             reader.close();
             input.close();
-        } catch (FileNotFoundException e) {
-            result.code = ERROR_saveFile;
-            return result;
         } catch (IOException e) {
-            result.code = ERROR_saveFile;
+            result.Code = ERROR_saveFile;
             return result;
         } finally {
             connection.disconnect();

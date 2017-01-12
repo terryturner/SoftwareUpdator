@@ -14,12 +14,11 @@ import android.view.View;
 import com.goldtek.sw.updater.R;
 import com.goldtek.sw.updater.ScheduleService;
 import com.goldtek.sw.updater.ScheduleService.LocalBinder;
-import com.goldtek.sw.updater.data.Response;
+import com.goldtek.sw.updater.data.GetRequest;
+import com.goldtek.sw.updater.data.GetResponse;
 import com.goldtek.sw.updater.data.xml.MaintainItem;
-import com.goldtek.sw.updater.data.Mail;
 import com.goldtek.sw.updater.model.HttpDownloader;
 import com.goldtek.sw.updater.model.HttpsDownloader;
-import com.goldtek.sw.updater.model.MailSender;
 import com.goldtek.sw.updater.model.XmlParser;
 
 import org.xmlpull.v1.XmlPullParserException;
@@ -107,27 +106,31 @@ public class TestActivity extends Activity implements View.OnClickListener {
     }
 
     private void downloadHttp(){
+        GetRequest request = new GetRequest("http://192.168.42.35/test_auth/test.html", "test.html");
+        request.setOption(HttpDownloader.KEY_AUTH, "terry:test");
         new HttpDownloader(new HttpDownloader.IDownload() {
             @Override
             public void onProgressUpdate(int progress) {}
 
             @Override
-            public void onPostExecute(Response result) {
-                Log.i("terry", result.fileName + " get code: " + result.code);
+            public void onPostExecute(GetResponse result) {
+                Log.i("terry", result.FilePath + " get code: " + result.Code);
             }
-        }).execute("http://192.168.42.35/test_auth/test.html", "terry:terryy", "test.html");
+        }).execute(request);
     }
 
     private void downloadHttps(){
+        GetRequest request = new GetRequest("https://192.168.42.35/test_auth/test.html", "test.html");
+        request.setOption(HttpDownloader.KEY_AUTH, "terry:test");
         new HttpsDownloader(new HttpsDownloader.IDownload() {
             @Override
             public void onProgressUpdate(int progress) {}
 
             @Override
-            public void onPostExecute(Response result) {
-                Log.i("terry", result.fileName + " get code: " + result.code);
+            public void onPostExecute(GetResponse result) {
+                Log.i("terry", result.FilePath + " get code: " + result.Code);
             }
-        }).execute("https://192.168.42.35/test_auth/test.html", "terry:terryy", "test.html");
+        }).execute(request);
     }
 
     private void enableBindingButton(final boolean enable) {

@@ -13,7 +13,8 @@ import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.goldtek.sw.updater.data.Response;
+import com.goldtek.sw.updater.data.GetResponse;
+import com.goldtek.sw.updater.data.PmRequest;
 import com.goldtek.sw.updater.model.ReportHandler;
 import com.goldtek.sw.updater.model.ScheduleHandler;
 import com.goldtek.sw.updater.presenter.ConfigManager;
@@ -79,7 +80,7 @@ public class ScheduleService extends Service implements ScheduleHandler.Listener
 
         mExecuteThread = new HandlerThread("executor");
         mExecuteThread.start();
-        mExecutor = new ScheduleHandler(mExecuteThread.getLooper());
+        mExecutor = new ScheduleHandler(mExecuteThread.getLooper(), this);
         mExecutor.setListener(this);
 
         PackageManager.getInstance();
@@ -113,29 +114,29 @@ public class ScheduleService extends Service implements ScheduleHandler.Listener
     }
 
     @Override
-    public void onPostExecute(final Response result) {
-        Log.i("terry", result.code + " : " + result.fileName);
+    public void onPostExecute(final GetResponse result) {
+        Log.i("terry", result.Code + " : " + result.Request.FileName);
+
         if (mToastWord != null) mToastWord.cancel();
-        if (result.code == HttpURLConnection.HTTP_OK && result.fileName.equals("sample.xml")) {
+        if (result.Request.FileName.equals("sample.xml")) {
             Message.obtain(mExecutor, ScheduleHandler.PARSE_XML_FILE, result).sendToTarget();
-            ConfigManager.getInstance().recordSyncTime(true);
+            ConfigManager.getInstance().recordSyncTime(result.isHttpOK());
 
-            mToastWord = Toast.makeText(getApplicationContext(), "Sync now", Toast.LENGTH_SHORT);
-            mToastWord.show();
-        } else if (result.code != HttpURLConnection.HTTP_OK && result.fileName.equals("sample.xml")) {
-            Message.obtain(mExecutor, ScheduleHandler.PARSE_XML_FILE, result).sendToTarget();
-            ConfigManager.getInstance().recordSyncTime(false);
-
-            mToastWord = Toast.makeText(getApplicationContext(), "Sync Fail", Toast.LENGTH_SHORT);
+            mToastWord = Toast.makeText(getApplicationContext(), result.isHttpOK() ? "Sync now" : "Sync Fail", Toast.LENGTH_SHORT);
             mToastWord.show();
 
-            //TODO: send report via mail
-            ReportHandler.getInstance().writeMessageFormat(R.string.msg_schedule_sync_fail_format, result.code, result.request);
-        } else if (result.code == HttpURLConnection.HTTP_OK && result.fileName.equals("com.goldtek.sw.updater.apk")) {
-            Message.obtain(mExecutor, ScheduleHandler.INSTALL_APK_FILE, result).sendToTarget();
+            if (!result.isHttpOK()) {
+                ReportHandler.getInstance().writeMessageFormat(R.string.msg_schedule_sync_fail_format, result.Code, result.Request.RequestURL);
+                //TODO: send report via mail due to sync fail xxx times
+            }
+        } else if (result.Request.getOption(ConfigManager.KEY_PACKAGE_NAME).equals(getPackageName())) {
+            if (result.isHttpOK()) {
+                PmRequest request = new PmRequest(getPackageName(), result.FilePath);
+                Message.obtain(mExecutor, ScheduleHandler.INSTALL_APK_FILE, request).sendToTarget();
+            } else
+                ReportHandler.getInstance().writeMessageFormat(R.string.msg_schedule_sync_fail_format, result.Code, result.Request.RequestURL);
         }
 
-        //TODO: error report
     }
 
     @Override
