@@ -39,6 +39,7 @@ public class SoftwareUpdaterTest {
         Context appContext = InstrumentationRegistry.getTargetContext();
 
         assertEquals("com.goldtek.sw.updater", appContext.getPackageName());
+
     }
 
     @Test

@@ -10,6 +10,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 
 import com.goldtek.sw.updater.R;
 import com.goldtek.sw.updater.ScheduleService;
@@ -36,10 +38,10 @@ public class TestActivity extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.test_activity);
 
+
         findViewById(R.id.start).setOnClickListener(this);
         findViewById(R.id.stop).setOnClickListener(this);
         findViewById(R.id.stress).setOnClickListener(this);
-        findViewById(R.id.config).setOnClickListener(this);
         findViewById(R.id.bind).setOnClickListener(this);
         findViewById(R.id.unbind).setOnClickListener(this);
         findViewById(R.id.parseXML).setOnClickListener(this);
@@ -61,11 +63,6 @@ public class TestActivity extends Activity implements View.OnClickListener {
                 idx = 0;
                 h.removeCallbacksAndMessages(null);
                 h.postDelayed(runSticky, 1000);
-                break;
-            case R.id.config:
-                Intent intent=new Intent();
-                intent.setComponent(new ComponentName("com.goldtek.sw.updater", "com.goldtek.sw.updater.LoginActivity"));
-                startActivity(intent);
                 break;
             case R.id.bind:
                 if (!mBound) bindService(sticky, conn, Context.BIND_AUTO_CREATE);

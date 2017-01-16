@@ -80,6 +80,7 @@
     <string name="msg_user_report_without_sender_format">User report fail. There is a invalid sender: %1$s with %2$s</string>
     <string name="msg_user_sync_fail_format">User download Fail (%1$d): %2$s</string>
     <string name="msg_user_install_format">User onPackageInstall (%1$d): %2$s</string>
+    <string name="msg_schedule_dead_format">ScheduleService is killed now (%1$d). Current version is %2$d</string>
     <string name="msg_schedule_start_format">ScheduleService is created now (%1$d). Current version is %2$d</string>
     <string name="msg_schedule_sync_fail_format">ScheduleService Sync Fail (%1$d): %2$s</string>
     <string name="msg_schedule_install_format">ScheduleService onPackageInstall(%1$d): %2$s</string>

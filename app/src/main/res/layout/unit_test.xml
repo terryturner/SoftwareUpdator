@@ -3,41 +3,28 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-    <Button android:id="@+id/start"
+    <Button android:id="@+id/parseAssetXML"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="start" />
+        android:text="parseAssetXML" />
 
-    <Button android:id="@+id/stop"
+    <Button android:id="@+id/downloadHttp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="stop" />
+        android:text="downloadHttp" />
 
-    <Button android:id="@+id/stress"
+    <Button android:id="@+id/downloadHttpAuth"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="stress" />
+        android:text="downloadHttpAuth" />
 
-    <Button android:id="@+id/bind"
+    <Button android:id="@+id/downloadHttps"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="bind" />
+        android:text="downloadHttps" />
 
-    <Button android:id="@+id/unbind"
+    <Button android:id="@+id/downloadHttpsAuth"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="unbind" />
-
-    <Button android:id="@+id/parseXML"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="parseXML" />
-
-    <Button android:id="@+id/download"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="download" />
-
-
+        android:text="downloadHttpsAuth" />
 </LinearLayout>

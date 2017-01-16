@@ -1,15 +1,19 @@
 package com.goldtek.sw.updater;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -34,6 +38,7 @@ public class ScheduleService extends Service implements ScheduleHandler.Listener
     private final IBinder mBinder = new LocalBinder();
     private final ReceiverManager mReceiver = new ReceiverManager(this);
 
+    private Handler mHandler = new Handler();
     private Handler mPoller = null;
     private HandlerThread mPollThread = null;
     private HandlerThread mExecuteThread = null;
@@ -56,6 +61,7 @@ public class ScheduleService extends Service implements ScheduleHandler.Listener
     public int onStartCommand(Intent intent, int flags, int startId) {
         long id = Thread.currentThread().getId();
         Log.i(TAG, "Received startId " + startId +  " ThreadId " + id + " : hashCode " + ScheduleService.this.hashCode());
+
         if (!mReceiver.isReceiverRegistered(checkAlive)) {
             IntentFilter filter = new IntentFilter();
             filter.addAction(Intent.ACTION_TIME_TICK);
@@ -96,6 +102,10 @@ public class ScheduleService extends Service implements ScheduleHandler.Listener
     @Override
     public void onDestroy() {
         super.onDestroy();
+        int pid = android.os.Process.myPid();
+        String msg = String.format(getString(R.string.msg_schedule_dead_format), pid, PackageManager.getInstance().getApplicationInfo().versionCode);
+        ReportHandler.getInstance().writeMessage(msg);
+
         sendBroadcast(new Intent("com.goldtek.sw.updater.ScheduleService.onDestroy"));
         mReceiver.unregisterReceiver(checkAlive);
 
@@ -169,14 +179,16 @@ public class ScheduleService extends Service implements ScheduleHandler.Listener
         }
     }
 
-    public void setAutoUpdate(boolean enabled) {
-        if (enabled) mExecutor.removeCallbacksAndMessages(null);
-        else mExecutor.sendEmptyMessage(ScheduleHandler.POST_AUTO_UPDATE);
-    }
-
-    public void modifyFrequency() {
-        mExecutor.removeCallbacksAndMessages(null);
-        mExecutor.sendEmptyMessage(ScheduleHandler.POST_AUTO_UPDATE);
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        // TODO Auto-generated method stub
+        Intent restartService = new Intent(getApplicationContext(), this.getClass());
+        restartService.setPackage(getPackageName());
+        PendingIntent restartServicePI = PendingIntent.getService(
+                getApplicationContext(), 1, restartService,
+                PendingIntent.FLAG_ONE_SHOT);
+        AlarmManager alarmService = (AlarmManager)getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() +1000, restartServicePI);
     }
 
     public void sync() {
@@ -184,10 +196,6 @@ public class ScheduleService extends Service implements ScheduleHandler.Listener
     }
 
     public void exception() {
-//        int pid = android.os.Process.myPid();
-//        long id = Thread.currentThread().getId();
-//        Log.i(TAG, "exception Pid " + pid + ", ThreadId " + id + " : hashCode " + ScheduleService.this.hashCode());
-
         int[] array = new int[2];
         array[2] = 0;
     }
@@ -205,9 +213,9 @@ public class ScheduleService extends Service implements ScheduleHandler.Listener
     BroadcastReceiver checkAlive = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-//        int pid = android.os.Process.myPid();
-//        long id = Thread.currentThread().getId();
-//        Log.i(TAG, "checkAlive " + pid + ", ThreadId " + id + " : hashCode " + ScheduleService.this.hashCode());
+            int pid = android.os.Process.myPid();
+            long id = Thread.currentThread().getId();
+            Log.i(TAG, "checkAlive " + pid + ", ThreadId " + id + " : hashCode " + ScheduleService.this.hashCode());
         }
     };
 

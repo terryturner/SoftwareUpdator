@@ -43,20 +43,24 @@
             android:launchMode="singleInstance"
             android:windowSoftInputMode="stateVisible|adjustResize"
             android:theme="@android:style/Theme.NoTitleBar">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
-        </activity>
-        <activity
-            android:name=".SettingsActivity"
-            android:label="@string/page_setting_name"
-            android:windowSoftInputMode="adjustResize|stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/page_setting_name"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden">
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
+        </activity>
+        <activity android:name=".ExitActivity"
+            android:theme="@android:style/Theme.NoDisplay"
+            android:autoRemoveFromRecents="true"/>
+
         <activity
             android:name=".test.TestActivity"
             android:label="@string/page_test_name">
@@ -64,6 +68,10 @@
                 <!--<action android:name="android.intent.action.MAIN" />-->
                 <!--<category android:name="android.intent.category.LAUNCHER" />-->
             <!--</intent-filter>-->
+        </activity>
+        <activity
+            android:name=".test.UnitTestActivity"
+            android:label="@string/page_test_name">
         </activity>
     </application>
 

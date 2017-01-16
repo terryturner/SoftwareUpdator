@@ -225,7 +225,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 Toast.makeText(this, "Error with background service!", Toast.LENGTH_SHORT).show();
             }
         } else if (header.id == R.id.com_goldtek_sw_updater_Logout) {
-            finish();
+            ExitActivity.exitApplication(this);
         }
     }
 
