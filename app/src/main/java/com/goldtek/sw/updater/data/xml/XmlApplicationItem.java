@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.goldtek.sw.updater.GoldtekApplication;
+import com.goldtek.sw.updater.data.ApplicationItem;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -40,6 +41,10 @@ public final class XmlApplicationItem extends MaintainItem {
     public String getAuthPassword() { return auth_password; }
     public String getAuth() {
         return auth_account + ":" + auth_password;
+    }
+
+    public ApplicationItem queryItem() {
+        return new ApplicationItem(getPackageName(), getVersionCode(), getDeployTime().getTime());
     }
 
     public boolean isUpdater() {

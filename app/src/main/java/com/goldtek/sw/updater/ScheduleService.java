@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Binder;
-import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -25,13 +24,17 @@ import com.goldtek.sw.updater.presenter.ConfigManager;
 import com.goldtek.sw.updater.presenter.PackageManager;
 import com.goldtek.sw.updater.receiver.ReceiverManager;
 
-import java.net.HttpURLConnection;
-
 /**
  * Created by Terry on 2016/12/29.
  */
 
 public class ScheduleService extends Service implements ScheduleHandler.Listener, ConfigManager.Observer {
+    public static final String ACTION_SYNC_NOW = "www.goldtek.com.ACTION_SYNC_NOW";
+    public static final String ACTION_QUERY_APP = "www.goldtek.com.ACTION_QUERY_APP";
+    public static final String ACTION_INSTALL_APP = "www.goldtek.com.ACTION_INSTALL_APP";
+    public static final String ACTION_APP_INFO = "www.goldtek.com.ACTION_APP_INFO";
+    public static final String KEY_NAME = "www.goldtek.com.KEY_NAME";
+
     private static final String TAG = "ScheduleService";
     private static final int MINUTE2MILLI = 60000;
 
@@ -62,10 +65,17 @@ public class ScheduleService extends Service implements ScheduleHandler.Listener
         long id = Thread.currentThread().getId();
         Log.i(TAG, "Received startId " + startId +  " ThreadId " + id + " : hashCode " + ScheduleService.this.hashCode());
 
-        if (!mReceiver.isReceiverRegistered(checkAlive)) {
+        if (!mReceiver.isReceiverRegistered(TickerListener)) {
             IntentFilter filter = new IntentFilter();
             filter.addAction(Intent.ACTION_TIME_TICK);
-            //mReceiver.registerReceiver(checkAlive, filter);
+            //mReceiver.registerReceiver(TickerListener, filter);
+        }
+        if (!mReceiver.isReceiverRegistered(CommandListener)) {
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(ACTION_SYNC_NOW);
+            filter.addAction(ACTION_QUERY_APP);
+            filter.addAction(ACTION_INSTALL_APP);
+            mReceiver.registerReceiver(CommandListener, filter);
         }
 
         return START_STICKY;
@@ -96,6 +106,9 @@ public class ScheduleService extends Service implements ScheduleHandler.Listener
         if (ConfigManager.getInstance().isAutoUpdate()) {
             mExecutor.sendEmptyMessage(ScheduleHandler.GET_XML_FILE);
             mPoller.postDelayed(AutoUpdate, ConfigManager.getInstance().getSyncFrequency() * MINUTE2MILLI);
+        } else {
+            //TODO: parse xml immediately
+            Message.obtain(mExecutor, ScheduleHandler.PARSE_XML_FILE, GoldtekApplication.getXmlPath()).sendToTarget();
         }
     }
 
@@ -107,7 +120,8 @@ public class ScheduleService extends Service implements ScheduleHandler.Listener
         ReportHandler.getInstance().writeMessage(msg);
 
         sendBroadcast(new Intent("com.goldtek.sw.updater.ScheduleService.onDestroy"));
-        mReceiver.unregisterReceiver(checkAlive);
+        mReceiver.unregisterReceiver(TickerListener);
+        mReceiver.unregisterReceiver(CommandListener);
 
         ConfigManager.getInstance().removeObserver(this);
 
@@ -128,11 +142,12 @@ public class ScheduleService extends Service implements ScheduleHandler.Listener
         Log.i("terry", result.Code + " : " + result.Request.FileName);
 
         if (mToastWord != null) mToastWord.cancel();
-        if (result.Request.FileName.equals("sample.xml")) {
-            Message.obtain(mExecutor, ScheduleHandler.PARSE_XML_FILE, result).sendToTarget();
+        if (result.Request.FileName.equals(GoldtekApplication.sFileXml)) {
+            Message.obtain(mExecutor, ScheduleHandler.PARSE_XML_FILE, result.FilePath).sendToTarget();
             ConfigManager.getInstance().recordSyncTime(result.isHttpOK());
 
-            mToastWord = Toast.makeText(getApplicationContext(), result.isHttpOK() ? "Sync now" : "Sync Fail", Toast.LENGTH_SHORT);
+            mToastWord = Toast.makeText(ScheduleService.this, result.isHttpOK() ? getString(R.string
+                    .toast_sync_success) : getString(R.string.toast_sync_fail), Toast.LENGTH_SHORT);
             mToastWord.show();
 
             if (!result.isHttpOK()) {
@@ -181,7 +196,6 @@ public class ScheduleService extends Service implements ScheduleHandler.Listener
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        // TODO Auto-generated method stub
         Intent restartService = new Intent(getApplicationContext(), this.getClass());
         restartService.setPackage(getPackageName());
         PendingIntent restartServicePI = PendingIntent.getService(
@@ -189,9 +203,14 @@ public class ScheduleService extends Service implements ScheduleHandler.Listener
                 PendingIntent.FLAG_ONE_SHOT);
         AlarmManager alarmService = (AlarmManager)getApplicationContext().getSystemService(Context.ALARM_SERVICE);
         alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() +1000, restartServicePI);
+
+        int pid = android.os.Process.myPid();
+        String msg = String.format(getString(R.string.msg_schedule_removed_format), pid, PackageManager.getInstance().getApplicationInfo().versionCode);
+        ReportHandler.getInstance().writeMessage(msg);
     }
 
     public void sync() {
+        ConfigManager.getInstance().recordSyncTime(false);
         mExecutor.sendEmptyMessage(ScheduleHandler.GET_XML_FILE);
     }
 
@@ -210,13 +229,34 @@ public class ScheduleService extends Service implements ScheduleHandler.Listener
         }
     };
 
-    BroadcastReceiver checkAlive = new BroadcastReceiver() {
+    BroadcastReceiver TickerListener = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             int pid = android.os.Process.myPid();
             long id = Thread.currentThread().getId();
-            Log.i(TAG, "checkAlive " + pid + ", ThreadId " + id + " : hashCode " + ScheduleService.this.hashCode());
+            Log.i(TAG, "TickerListener " + pid + ", ThreadId " + id + " : hashCode " + ScheduleService.this.hashCode());
         }
     };
 
+    BroadcastReceiver CommandListener = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+                case ACTION_SYNC_NOW:
+                    if (Math.abs(System.currentTimeMillis() - ConfigManager.getInstance().getLastSyncTime()) > MINUTE2MILLI) {
+                        sync();
+                    }
+                    break;
+                case ACTION_QUERY_APP:
+                    Message.obtain(mExecutor, ScheduleHandler.QUERY_APK_INFO, intent.getStringExtra(KEY_NAME)).sendToTarget();
+                    break;
+                case ACTION_INSTALL_APP:
+                    if (intent.getStringExtra(KEY_NAME) != null) {
+                        PmRequest request = new PmRequest(intent.getStringExtra(KEY_NAME), null);
+                        Message.obtain(mExecutor, ScheduleHandler.INSTALL_APK_FILE, request).sendToTarget();
+                    }
+                    break;
+            }
+        }
+    };
 }

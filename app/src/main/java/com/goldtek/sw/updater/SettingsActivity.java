@@ -222,7 +222,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 Intent sticky = new Intent(this, ScheduleService.class);
                 bindService(sticky, mScheduleConnection, Context.BIND_AUTO_CREATE);
 
-                Toast.makeText(this, "Error with background service!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.toast_bind_fail), Toast.LENGTH_SHORT).show();
             }
         } else if (header.id == R.id.com_goldtek_sw_updater_Logout) {
             ExitActivity.exitApplication(this);

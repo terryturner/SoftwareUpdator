@@ -39,7 +39,7 @@ public class LoginActivity extends Activity implements View.OnClickListener{
 
             finish();
         } else
-            Toast.makeText(this, "auth " + auth(text.getText().toString()), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.toast_login_fail), Toast.LENGTH_SHORT).show();
     }
 
     private boolean auth(String password) {

@@ -11,6 +11,7 @@ import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
 import android.view.View;
 
+import com.goldtek.sw.updater.GoldtekApplication;
 import com.goldtek.sw.updater.R;
 import com.goldtek.sw.updater.ScheduleService;
 import com.goldtek.sw.updater.ScheduleService.LocalBinder;
@@ -56,16 +57,16 @@ public class UnitTestActivity extends Activity implements View.OnClickListener {
                 testPrintXML();
                 break;
             case R.id.downloadHttp:
-                downloadHttp("http://192.168.42.35/sample.xml", null, "sample.xml");
+                downloadHttp("http://192.168.42.35/sample.xml", null, GoldtekApplication.sFileXml);
                 break;
             case R.id.downloadHttpAuth:
-                downloadHttp("http://192.168.42.35/test_auth/sample.xml", "terry:test", "sample.xml");
+                downloadHttp("http://192.168.42.35/test_auth/sample.xml", "terry:test", GoldtekApplication.sFileXml);
                 break;
             case R.id.downloadHttps:
-                downloadHttps("https://192.168.42.35/sample.xml", null, "sample.xml");
+                downloadHttps("https://192.168.42.35/sample.xml", null, GoldtekApplication.sFileXml);
                 break;
             case R.id.downloadHttpsAuth:
-                downloadHttps("https://192.168.42.35/test_auth/sample.xml", "terry:test", "sample.xml");
+                downloadHttps("https://192.168.42.35/test_auth/sample.xml", "terry:test", GoldtekApplication.sFileXml);
                 break;
         }
     }
